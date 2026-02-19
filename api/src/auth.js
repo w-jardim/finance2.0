@@ -1,20 +1,9 @@
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 
-dotenv.config();
+const { JWT_SECRET = '', JWT_EXPIRES_IN = '7d' } = process.env;
 
-function getJwtSecret() {
-  const secret = process.env.JWT_SECRET;
-
-  if (!secret) {
-    throw new Error('JWT_SECRET environment variable is required');
-  }
-
-  return secret;
-}
-
-function getJwtExpiresIn() {
-  return process.env.JWT_EXPIRES_IN || '7d';
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
 }
 
 export function signAccessToken(user) {
@@ -22,10 +11,10 @@ export function signAccessToken(user) {
     {
       email: user.email,
     },
-    getJwtSecret(),
+    JWT_SECRET,
     {
       subject: String(user.id),
-      expiresIn: getJwtExpiresIn(),
+      expiresIn: JWT_EXPIRES_IN,
     },
   );
 }
@@ -40,7 +29,7 @@ export function requireAuth(req, res, next) {
   const token = authHeader.slice(7);
 
   try {
-    const payload = jwt.verify(token, getJwtSecret());
+    const payload = jwt.verify(token, JWT_SECRET);
 
     req.user = {
       id: Number(payload.sub),

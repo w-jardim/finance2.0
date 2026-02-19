@@ -24,10 +24,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/transactions', transactionsRoutes);
 
-app.use((_req, res) => {
-  res.status(404).json({ error: 'Not found' });
-});
-
 app.use((err, _req, res, _next) => {
   console.error(err);
   res.status(500).json({ error: 'Internal server error' });
